@@ -29,13 +29,13 @@ $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
   <?php include 'navbar.php'; ?>
   <div class="container mx-auto p-8">
-    <h2 class="text-2xl font-bold mb-6 <?php echo empty($result) ? 'text-center' : ''; ?>">
+    <h1 <?php echo empty($result) ? 'text-center' : ''; ?>">
       <?php if (empty($result)) {
-        echo "No photos uploaded, be the first one!";
+        echo '<h1 class="text-3xl font-bold mb-6 text-center">No photos uploaded, be the first one!</h1>';
       } else {
-        echo "Uploaded Photos";
+        echo '<h1 class="text-3xl font-bold mb-6">Uploaded Photos</h1>';
       } ?>
-    </h2>
+    </h1>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <?php foreach ($result as $row) { ?>
         <div class="bg-white rounded-lg shadow-lg p-4">

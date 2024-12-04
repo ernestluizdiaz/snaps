@@ -32,30 +32,32 @@ $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <body>
   <?php include 'navbar.php' ?>
-  <div class="container mx-auto py-6">
-    <h1 class="text-2xl font-semibold mb-4">Activity Log</h1>
-    <table class="min-w-full bg-white border border-gray-300">
-      <thead>
-        <tr>
-          <th class="py-2 px-4 border-b">Log ID</th>
-          <th class="py-2 px-4 border-b">Username</th>
-          <th class="py-2 px-4 border-b">Action</th>
-          <th class="py-2 px-4 border-b">Record ID</th>
-          <th class="py-2 px-4 border-b">Action Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php foreach ($logs as $log): ?>
+  <div class="container mx-auto py-6 px-4">
+    <h1 class="text-3xl font-bold mb-6 text-gray-900">Activity Logs</h1>
+    <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+      <table class="w-full bg-white border-collapse border border-gray-300">
+        <thead class="bg-gray-100">
           <tr>
-            <td class="py-2 px-4 border-b"><?php echo $log['log_id']; ?></td>
-            <td class="py-2 px-4 border-b"><?php echo htmlspecialchars($log['username']); ?></td>
-            <td class="py-2 px-4 border-b"><?php echo htmlspecialchars($log['action']); ?></td>
-            <td class="py-2 px-4 border-b"><?php echo $log['record_id']; ?></td>
-            <td class="py-2 px-4 border-b"><?php echo $log['action_date']; ?></td>
+            <th class="py-3 px-6 border-b text-left text-sm font-medium text-gray-700">Log ID</th>
+            <th class="py-3 px-6 border-b text-left text-sm font-medium text-gray-700">Username</th>
+            <th class="py-3 px-6 border-b text-left text-sm font-medium text-gray-700">Action</th>
+            <th class="py-3 px-6 border-b text-left text-sm font-medium text-gray-700">Record ID</th>
+            <th class="py-3 px-6 border-b text-left text-sm font-medium text-gray-700">Action Date</th>
           </tr>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <?php foreach ($logs as $log): ?>
+            <tr class="hover:bg-gray-50">
+              <td class="py-3 px-6 border-b text-sm text-gray-800"><?php echo $log['log_id']; ?></td>
+              <td class="py-3 px-6 border-b text-sm text-gray-800"><?php echo htmlspecialchars($log['username']); ?></td>
+              <td class="py-3 px-6 border-b text-sm text-gray-800"><?php echo htmlspecialchars($log['action']); ?></td>
+              <td class="py-3 px-6 border-b text-sm text-gray-800"><?php echo $log['record_id']; ?></td>
+              <td class="py-3 px-6 border-b text-sm text-gray-800"><?php echo $log['action_date']; ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
   </div>
 </body>
 

@@ -26,3 +26,16 @@ CREATE TABLE activity_log (
     action_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
+
+
+CREATE TABLE collage_records (
+    record_id INT AUTO_INCREMENT PRIMARY KEY,  
+    student_id INT NOT NULL,                    
+    student_name VARCHAR(255) NOT NULL,          
+    course_name VARCHAR(255) NOT NULL,           
+    date_of_enrollment DATE NOT NULL,            
+    grade VARCHAR(5),                           
+    status ENUM('Active', 'Graduated', 'Dropped') NOT NULL DEFAULT 'Active',  
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP  
+);

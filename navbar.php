@@ -51,12 +51,12 @@ if ($userId) {
           <li><a href="index.php"
               class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700  dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700 <?php echo ($currentPage == 'index.php') ? 'md:text-blue-700' : ''; ?>">Home</a>
           </li>
+          <li><a href="records.php"
+              class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700 <?php echo ($currentPage == 'records.php') ? 'md:text-blue-700' : ''; ?>">Records</a>
+          </li>
           <li><a href="activitylogs.php"
               class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700 <?php echo ($currentPage == 'activitylogs.php') ? 'md:text-blue-700' : ''; ?>">Activity
               Logs</a>
-          </li>
-          <li><a href="records.php"
-              class="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700 <?php echo ($currentPage == 'records.php') ? 'md:text-blue-700' : ''; ?>">Records</a>
           </li>
         </ul>
       </div>
@@ -70,7 +70,6 @@ if ($userId) {
         <button class="px-4 py-2 bg-blue-700 text-white rounded-lg text-sm">Add a moment</button>
       </a>
 
-
       <div class="flex items-center">
         <!-- Search Bar (Only on records.php) -->
         <?php if ($currentPage === 'records.php') { ?>
@@ -82,12 +81,59 @@ if ($userId) {
                   d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
               </svg>
             </div>
-            <input type="text" id="search-navbar"
-              class="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Search...">
+            <!-- Form to submit the search input -->
+            <form method="GET" action="records.php" onsubmit="return true;">
+              <input type="text" name="search" id="search-navbar"
+                class="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Search record"
+                value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>"
+                oninput="toggleClearButton()" />
+            </form>
+
+            <!-- Clear button (X) -->
+            <button id="clear-btn" class="absolute inset-y-0 end-0 flex items-center pe-3 hidden" onclick="clearSearch()">
+              <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 20 20">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M6 6L14 14M6 14L14 6" />
+              </svg>
+            </button>
           </div>
         <?php } ?>
       </div>
+
+      <script>
+        // Function to toggle visibility of the "X" button
+        function toggleClearButton() {
+          const searchInput = document.getElementById('search-navbar');
+          const clearButton = document.getElementById('clear-btn');
+          if (searchInput.value.length > 0) {
+            clearButton.classList.remove('hidden');
+          } else {
+            clearButton.classList.add('hidden');
+          }
+        }
+
+        // Function to clear the search input and reset the table view
+        function clearSearch() {
+          const searchInput = document.getElementById('search-navbar');
+          const clearButton = document.getElementById('clear-btn');
+          searchInput.value = '';  // Clear the search input field
+          toggleClearButton();  // Hide the "X" button
+
+          // Reset the table by reloading the page without the search query
+          window.location.href = "records.php"; // This will reload the page and reset the search filter
+        }
+
+        // Keep the "X" button visible after form submission
+        window.onload = function () {
+          const searchInput = document.getElementById('search-navbar');
+          const clearButton = document.getElementById('clear-btn');
+          if (searchInput.value.length > 0) {
+            clearButton.classList.remove('hidden');
+          }
+        }
+      </script>
 
       <!-- Account Dropdown -->
       <div class="relative">
