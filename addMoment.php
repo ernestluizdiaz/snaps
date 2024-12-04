@@ -2,7 +2,7 @@
 require_once 'core/dbConfig.php'; // Include dbConfig to access $pdo
 
 if (isset($_POST['submit'])) {
-  // Get description and post from the form
+  // Get description and title from the form
   $description = $_POST['description'];
   $title = $_POST['title'];
 
@@ -27,6 +27,17 @@ if (isset($_POST['submit'])) {
     $stmt->bindParam(':description', $description);
     $stmt->bindParam(':title', $title);
     $stmt->execute();
+
+    // Get the user ID from session (assuming you're using sessions for user login)
+    session_start();
+    $userId = $_SESSION['user_id'] ?? null;
+
+    // Log the action if the user is logged in
+    if ($userId) {
+      $logQuery = "INSERT INTO activity_log (user_id, action, record_id) VALUES (?, ?, ?)";
+      $logStmt = $pdo->prepare($logQuery);
+      $logStmt->execute([$userId, 'Added New Photo', $pdo->lastInsertId()]);
+    }
 
     // Ensure the uploads folder exists and is writable
     $folder = "uploads/" . $imageName;
@@ -88,7 +99,7 @@ if (isset($_POST['submit'])) {
       </div>
 
       <div class="text-center">
-        <input type="submit" name="submit" value="Upload Photo"
+        <input type="submit" name="submit" value="Post Moment"
           class="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
       </div>
     </form>

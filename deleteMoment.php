@@ -17,17 +17,33 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     if ($photo) {
       // If the form is submitted for deletion confirmation
       if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
+        // Get the user ID from session (assuming you're using sessions for user login)
+        session_start();
+        $userId = $_SESSION['user_id'] ?? null;
+
         // Delete the photo from the database
         $deleteQuery = "DELETE FROM photos WHERE photo_id = :photo_id";
         $deleteStmt = $pdo->prepare($deleteQuery);
         $deleteStmt->bindParam(':photo_id', $photo_id, PDO::PARAM_INT);
 
         if ($deleteStmt->execute()) {
+          // Log the deletion in the activity log
+          if ($userId) {
+            // Log message for deleted photo
+            $logMessage = 'Deleted Photo (ID: ' . $photo_id . ')';
+
+            // Insert the log into activity_log
+            $logQuery = "INSERT INTO activity_log (user_id, action, record_id) VALUES (?, ?, ?)";
+            $logStmt = $pdo->prepare($logQuery);
+            $logStmt->execute([$userId, $logMessage, $photo_id]);
+          }
+
           // Delete the physical file from the server
           $filePath = 'uploads/' . $photo['photo_name'];
           if (file_exists($filePath)) {
             unlink($filePath); // Delete the file
           }
+
           // Redirect after successful deletion
           header("Location: index.php");
           exit();
@@ -45,6 +61,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
   $error = "Invalid photo ID.";
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

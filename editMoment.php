@@ -39,6 +39,29 @@ if (isset($_POST['submit'])) {
   $fileName = $_FILES['photo']['name'];
   $tempFileName = $_FILES['photo']['tmp_name'];
 
+  // Get the user ID from session (assuming you're using sessions for user login)
+  session_start();
+  $userId = $_SESSION['user_id'] ?? null;
+
+  // Initialize the log action message
+  $logAction = 'Updated Photo';
+
+  // Determine which fields were updated
+  $fieldsUpdated = [];
+  $updateQuery = "UPDATE photos SET ";
+
+  // Check if description is updated
+  if ($description != $currentDescription) {
+    $updateQuery .= "description = :description, ";
+    $fieldsUpdated[] = "Description";
+  }
+
+  // Check if title is updated
+  if ($title != $currentTitle) {
+    $updateQuery .= "title = :title, ";
+    $fieldsUpdated[] = "Title";
+  }
+
   // If a new file is uploaded, update the photo name
   if ($fileName) {
     // Get file extension
@@ -54,44 +77,61 @@ if (isset($_POST['submit'])) {
     $folder = "uploads/" . $imageName;
 
     if (move_uploaded_file($tempFileName, $folder)) {
-      // If the file is successfully uploaded, update the photo name and other details in the database
-      try {
-        $query = "UPDATE photos SET photo_name = :photo_name, description = :description, title = :title WHERE photo_id = :photo_id";
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':photo_name', $imageName);
-        $stmt->bindParam(':description', $description);
-        $stmt->bindParam(':title', $title); // Bind the title
-        $stmt->bindParam(':photo_id', $photoID);
-        $stmt->execute();
-
-        // Redirect after successful update
-        header("Location: index.php");
-        exit();
-      } catch (PDOException $e) {
-        echo "Error updating photo details: " . $e->getMessage();
-      }
-    } else {
-      echo "Error uploading file. Make sure the uploads folder has proper permissions.";
+      $updateQuery .= "photo_name = :photo_name, ";
+      $fieldsUpdated[] = "File"; // Track file change
     }
-  } else {
-    // If no new file is uploaded, update only the description and title
-    try {
-      $query = "UPDATE photos SET description = :description, title = :title WHERE photo_id = :photo_id";
-      $stmt = $pdo->prepare($query);
+  }
+
+  // If fields were updated, remove the trailing comma and space
+  if (!empty($fieldsUpdated)) {
+    $updateQuery = rtrim($updateQuery, ', '); // Remove the last comma
+
+    // Add the WHERE clause to the query
+    $updateQuery .= " WHERE photo_id = :photo_id";
+
+    // Prepare the query
+    $stmt = $pdo->prepare($updateQuery);
+
+    // Bind parameters for updated fields
+    if (in_array('Description', $fieldsUpdated)) {
       $stmt->bindParam(':description', $description);
-      $stmt->bindParam(':title', $title); // Bind the title
-      $stmt->bindParam(':photo_id', $photoID);
+    }
+    if (in_array('Title', $fieldsUpdated)) {
+      $stmt->bindParam(':title', $title);
+    }
+    if (in_array('File', $fieldsUpdated)) {
+      $stmt->bindParam(':photo_name', $imageName);
+    }
+
+    $stmt->bindParam(':photo_id', $photoID);
+
+    try {
       $stmt->execute();
+
+      // Log the action in the activity log if the user is logged in
+      if ($userId) {
+        // Create a log message based on the updated fields
+        $logMessage = 'Updated Photo (';
+        $logMessage .= implode(', ', $fieldsUpdated);
+        $logMessage .= ')';
+
+        // Insert the activity log
+        $logQuery = "INSERT INTO activity_log (user_id, action, record_id) VALUES (?, ?, ?)";
+        $logStmt = $pdo->prepare($logQuery);
+        $logStmt->execute([$userId, $logMessage, $photoID]);
+      }
 
       // Redirect after successful update
       header("Location: index.php");
       exit();
     } catch (PDOException $e) {
-      echo "Error updating description and title: " . $e->getMessage();
+      echo "Error updating photo details: " . $e->getMessage();
     }
   }
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -133,7 +173,7 @@ if (isset($_POST['submit'])) {
       </div>
 
       <div class="text-center">
-        <input type="submit" name="submit" value="Update Photo"
+        <input type="submit" name="submit" value="Update Moment"
           class="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
       </div>
     </form>
