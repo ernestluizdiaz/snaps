@@ -1,6 +1,28 @@
 <?php
 require_once 'core/dbConfig.php';
 $currentPage = basename($_SERVER['PHP_SELF']);
+
+$userId = $_SESSION['user_id'] ?? null; // Adjust session variable if necessary
+$userName = "Bonnie Green";
+$userEmail = "name@flowbite.com";
+
+if ($userId) {
+  $query = "SELECT first_name, last_name, email FROM user WHERE user_id = :id";
+  $stmt = $pdo->prepare($query);
+  $stmt->bindParam(':id', $userId, PDO::PARAM_INT);
+
+  if ($stmt->execute()) {
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($user) {
+      $userName = htmlspecialchars($user['first_name'] . " " . $user['last_name']);
+      $userEmail = htmlspecialchars($user['email']);
+    }
+  }
+}
+
+
+
+
 ?>
 
 <head>
@@ -81,8 +103,8 @@ $currentPage = basename($_SERVER['PHP_SELF']);
           class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600"
           id="user-dropdown">
           <div class="px-4 py-3">
-            <span class="block text-sm text-gray-900 dark:text-white">Bonnie Green</span>
-            <span class="block text-sm text-gray-500 truncate dark:text-gray-400">name@flowbite.com</span>
+            <span class="block text-sm text-gray-900 dark:text-white"><?= $userName; ?></span>
+            <span class="block text-sm text-gray-500 truncate dark:text-gray-400"><?= $userEmail; ?></span>
           </div>
           <ul class="py-2" aria-labelledby="user-menu-button">
             <li><a href="signout.php"

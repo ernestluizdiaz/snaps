@@ -16,3 +16,13 @@ CREATE TABLE photos (
 	description VARCHAR(255),
 	date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
 );
+
+
+CREATE TABLE activity_log (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    action VARCHAR(255) NOT NULL,
+    record_id INT NOT NULL,
+    action_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user(user_id)
+);
