@@ -1,6 +1,13 @@
 <?php
 require_once 'core/dbConfig.php';
 
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+  // Redirect to login page if not logged in
+  header("Location: login.php");
+  exit();
+}
+
 // Query to get all the photos from the database
 $query = "SELECT * FROM photos";
 $stmt = $pdo->prepare($query);
